@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'AnimeCard.dart';
-import 'package:projects/models/anime.dart'; 
+import 'animeCard.dart';
+import 'package:projects/models/anime.dart';
 
 class HorizontalAnimeSection extends StatelessWidget {
   final String title;
@@ -33,7 +33,7 @@ class HorizontalAnimeSection extends StatelessWidget {
           const SizedBox(height: 8),
           // Horizontal List of Anime Cards
           SizedBox(
-            height: 180, 
+            height: 200,
             child: ListView.builder(
               shrinkWrap: true,
               scrollDirection: Axis.horizontal,

@@ -7,11 +7,8 @@ class JikanService {
 
   Future<Map<String, List<Anime>>> getAllSections() async {
     final trending = await getTrending();
-    await Future.delayed(const Duration(milliseconds: 800));
     final topAiring = await getTopAiring();
-    await Future.delayed(const Duration(milliseconds: 800));
     final mostPopular = await getMostPopular();
-    await Future.delayed(const Duration(milliseconds: 800));
     final topTV = await getTopTVSeries();
 
     return {
@@ -24,25 +21,21 @@ class JikanService {
 
   Future<List<Anime>> getTrending() async {
     final url = Uri.parse("$baseUrl/top/anime");
-    await Future.delayed(const Duration(milliseconds: 600));
     return _fetchAnimeList(url);
   }
 
   Future<List<Anime>> getTopAiring() async {
     final url = Uri.parse("$baseUrl/top/anime");
-    await Future.delayed(const Duration(milliseconds: 650));
     return _fetchAnimeList(url, isSeason: true);
   }
 
   Future<List<Anime>> getMostPopular() async {
     final url = Uri.parse("$baseUrl/top/anime?filter=bypopularity");
-    await Future.delayed(const Duration(milliseconds: 700));
     return _fetchAnimeList(url);
   }
 
   Future<List<Anime>> getTopTVSeries() async {
     final url = Uri.parse("$baseUrl/top/anime?type=tv");
-    await Future.delayed(const Duration(milliseconds: 800));
     return _fetchAnimeList(url);
   }
 

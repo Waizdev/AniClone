@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:projects/Components/SearchButton.dart';
 import 'package:projects/Components/Themebutton.dart';
-import 'package:projects/Components/Colorbutton.dart';
+import 'package:projects/Components/ColorButton.dart';
 import 'package:projects/Constants.dart';
 import 'package:projects/Screens/MainHome.dart';
 import 'package:projects/Screens/MyListScreen.dart';
@@ -30,16 +30,16 @@ class _HomeState extends State<Home> {
   int _currentIndex = 0;
 
   final List<Widget> _screens = [
-    MainHome(),
-    Schedulescreen(),
-    Mylistscreen(),
-    Profilescreen(),
+    const MainHome(),
+    const Schedulescreen(),
+    const MyListScreen(),
+    const Profilescreen(),
   ];
 
   @override
   Widget build(BuildContext context) {
-      // Determine contrasting color for BottomNavigationBar
-   final isDark = Theme.of(context).brightness == Brightness.dark;
+    // Determine contrasting color for BottomNavigationBar
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         title: Center(child: Text(widget.appTitle)),
@@ -55,17 +55,15 @@ class _HomeState extends State<Home> {
           ),
         ],
       ),
-
       body: IndexedStack(
-        index: _currentIndex, 
+        index: _currentIndex,
         children: _screens,
       ),
-      
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         unselectedItemColor: isDark ? Colors.white : Colors.black,
-        selectedItemColor: widget.colorSelected.color, 
-        backgroundColor: isDark ? Colors.grey[900] : Colors.white,     
+        selectedItemColor: widget.colorSelected.color,
+        backgroundColor: isDark ? Colors.grey[900] : Colors.white,
         elevation: 8,
         onTap: (index) {
           setState(() {
