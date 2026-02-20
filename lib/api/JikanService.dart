@@ -29,7 +29,7 @@ class JikanService {
   }
 
   Future<List<Anime>> getTopAiring() async {
-    final url = Uri.parse("$baseUrl/seasons/now");
+    final url = Uri.parse("$baseUrl/top/anime");
     await Future.delayed(const Duration(milliseconds: 650));
     return _fetchAnimeList(url, isSeason: true);
   }
