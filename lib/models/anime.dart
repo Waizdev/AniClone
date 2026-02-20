@@ -8,6 +8,7 @@ class Anime {
   final String status;      // Airing status
   final int episodes;       // Number of episodes
   final String url;         // Link to MyAnimeList page
+  final String synopsis;
 
   Anime({
     required this.malId,
@@ -18,6 +19,7 @@ class Anime {
     required this.status,
     required this.episodes,
     required this.url,
+    required this.synopsis
   });
 
   // Factory constructor to parse JSON data from Jikan API
@@ -31,6 +33,7 @@ class Anime {
       status: json['status'] ?? 'N/A',
       episodes: json['episodes'] ?? 0,
       url: json['url'] ?? '',
+      synopsis: json['synopsis'] ?? '',
     );
   }
 }
