@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:projects/Model/anime.dart'; // ✅ corrected path
+import '../models/anime.dart';
 
 class JikanService {
   final String baseUrl = "https://api.jikan.moe/v4";

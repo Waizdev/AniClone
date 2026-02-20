@@ -1,7 +1,6 @@
-// lib/components/horizontal_anime_section.dart
 import 'package:flutter/material.dart';
 import 'AnimeCard.dart';
-import 'package:projects/Model/anime.dart'; 
+import 'package:projects/models/anime.dart'; 
 
 class HorizontalAnimeSection extends StatelessWidget {
   final String title;

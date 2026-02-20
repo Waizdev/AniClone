@@ -6,9 +6,8 @@ class Profilescreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        color: Colors.amber,
-      ),
+      appBar: AppBar(title: Text("Profile"),leading: Icon(Icons.add_a_photo_outlined),),
+      body: ListView.builder(itemBuilder: (context, index) {return ListTile();} ,)
     );
   }
 }
