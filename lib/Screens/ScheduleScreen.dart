@@ -13,19 +13,21 @@ class Schedulescreen extends StatefulWidget {
   final Color accentColor;
 
   @override
-  State<Schedulescreen> createState() => _SchedulescreenState();
+  State<Schedulescreen> createState() => _ScheduleScreenState();
 }
 
-class _SchedulescreenState extends State<Schedulescreen> {
+class _ScheduleScreenState extends State<Schedulescreen> {
   final JikanService _service = JikanService();
   static const int _anchorIndex = 10000;
   static const int _virtualItemCount = 20001;
   static const double _dateChipWidth = 50;
   static const double _dateChipSpacing = 10;
+  static const double _monthSeparatorLead = 15;
   late final ScrollController _dateScrollController;
   final DateTime _baseDate = DateTime.now();
 
   int _selectedDateIndex = _anchorIndex;
+  int _firstVisibleDateIndex = _anchorIndex;
   List<Anime> _airingAnime = const [];
   bool _isLoading = true;
   String? _errorMessage;
@@ -37,13 +39,28 @@ class _SchedulescreenState extends State<Schedulescreen> {
       initialScrollOffset:
           _anchorIndex * (_dateChipWidth + _dateChipSpacing),
     );
+    _dateScrollController.addListener(_handleDateStripScroll);
     _loadSchedule();
   }
 
   @override
   void dispose() {
+    _dateScrollController.removeListener(_handleDateStripScroll);
     _dateScrollController.dispose();
     super.dispose();
+  }
+
+  void _handleDateStripScroll() {
+    final itemExtent = _dateChipWidth + _dateChipSpacing;
+    final rawIndex = ((_dateScrollController.offset + _monthSeparatorLead) /
+            itemExtent)
+        .floor();
+    final newIndex = rawIndex.clamp(0, _virtualItemCount - 1);
+    if (newIndex == _firstVisibleDateIndex) return;
+
+    setState(() {
+      _firstVisibleDateIndex = newIndex;
+    });
   }
 
   String _weekdayFilter(DateTime date) {
@@ -62,6 +79,24 @@ class _SchedulescreenState extends State<Schedulescreen> {
   String _weekdayLabel(DateTime date) {
     const days = <String>['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     return days[date.weekday - 1];
+  }
+
+  String _monthLabel(DateTime date) {
+    const months = <String>[
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    return months[date.month - 1];
   }
 
   String _broadcastTime(String broadcast) {
@@ -122,53 +157,117 @@ class _SchedulescreenState extends State<Schedulescreen> {
             const SizedBox(height: 12),
             SizedBox(
               height: 80,
-              child: ListView.separated(
-                controller: _dateScrollController,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                scrollDirection: Axis.horizontal,
-                itemCount: _virtualItemCount,
-                separatorBuilder: (context, index) => const SizedBox(width: 10),
-                itemBuilder: (context, index) {
-                  final date = _dateFromIndex(index);
-                  final isSelected = _selectedDateIndex == index;
-
-                  return GestureDetector(
-                    onTap: () => _onSelectDate(index),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      width: 50,
-                      decoration: BoxDecoration(
-                        color: isSelected ? widget.accentColor : Colors.transparent,
-                        borderRadius: BorderRadius.circular(34),
-                        border: Border.all(
-                          color: isSelected ? widget.accentColor : colorScheme.outline.withValues(alpha: 0.6),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 62,
+                    child: Center(
+                      child: Text(
+                        _monthLabel(_dateFromIndex(_firstVisibleDateIndex)),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: colorScheme.onSurface,
                         ),
                       ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            _weekdayLabel(date),
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: isSelected ? Colors.white : colorScheme.onSurface.withValues(alpha: .8),
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '${date.day}',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: isSelected ? Colors.white : colorScheme.onSurface,
-                            ),
-                          ),
-                        ],
-                      ),
                     ),
-                  );
-                },
+                  ),
+                  Expanded(
+                    child: ListView.separated(
+                      controller: _dateScrollController,
+                      padding: const EdgeInsets.only(right: 16),
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _virtualItemCount,
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(width: 10),
+                      itemBuilder: (context, index) {
+                        final date = _dateFromIndex(index);
+                        final isSelected = _selectedDateIndex == index;
+
+                        return GestureDetector(
+                          onTap: () => _onSelectDate(index),
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            alignment: Alignment.centerLeft,
+                            children: [
+                              Row(
+                                children: [
+                                  if (date.day == 1) ...[
+                                    Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          _monthLabel(date),
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w700,
+                                            color: colorScheme.onSurface
+                                                .withValues(alpha: .7),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Container(
+                                          width: 1.3,
+                                          height: 24,
+                                          color: colorScheme.outline
+                                              .withValues(alpha: 0.55),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(width: 16),
+                                  ],
+                                  AnimatedContainer(
+                                    duration: const Duration(milliseconds: 200),
+                                    width: _dateChipWidth,
+                                    decoration: BoxDecoration(
+                                      color: isSelected
+                                          ? widget.accentColor
+                                          : Colors.transparent,
+                                      borderRadius: BorderRadius.circular(34),
+                                      border: Border.all(
+                                        color: isSelected
+                                            ? widget.accentColor
+                                            : colorScheme.outline
+                                                .withValues(alpha: 0.6),
+                                      ),
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          _weekdayLabel(date),
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                            color: isSelected
+                                                ? Colors.white
+                                                : colorScheme.onSurface
+                                                    .withValues(alpha: .8),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          '${date.day}',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: isSelected
+                                                ? Colors.white
+                                                : colorScheme.onSurface,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 8),
