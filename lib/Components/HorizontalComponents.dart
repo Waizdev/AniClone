@@ -33,8 +33,9 @@ class HorizontalAnimeSection extends StatelessWidget {
           const SizedBox(height: 8),
           // Horizontal List of Anime Cards
           SizedBox(
-            height: 180, // Card height + spacing
+            height: 180, 
             child: ListView.builder(
+              shrinkWrap: true,
               scrollDirection: Axis.horizontal,
               itemCount: animeList.length,
               padding: const EdgeInsets.symmetric(horizontal: 12),
