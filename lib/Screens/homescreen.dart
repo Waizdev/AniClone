@@ -29,17 +29,16 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = [
-    const MainHome(),
-    const Schedulescreen(),
-    const MyListScreen(),
-    const Profilescreen(),
-  ];
-
   @override
   Widget build(BuildContext context) {
     // Determine contrasting color for BottomNavigationBar
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final screens = <Widget>[
+      const MainHome(),
+      Schedulescreen(accentColor: widget.colorSelected.color),
+      const MyListScreen(),
+      Profilescreen(accentColor: widget.colorSelected.color),
+    ];
     return Scaffold(
       appBar: AppBar(
         title: Center(child: Text(widget.appTitle)),
@@ -57,7 +56,7 @@ class _HomeState extends State<Home> {
       ),
       body: IndexedStack(
         index: _currentIndex,
-        children: _screens,
+        children: screens,
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,

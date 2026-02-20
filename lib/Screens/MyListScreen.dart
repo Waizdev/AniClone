@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:projects/Screens/AnimeDetailScreen.dart';
 import 'package:projects/models/anime.dart';
 import 'package:projects/services/my_list_storage.dart';
 
@@ -41,6 +42,14 @@ class _MyListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => AnimeDetailScreen(anime: anime),
+            ),
+          );
+        },
         leading: ClipRRect(
           borderRadius: BorderRadius.circular(8),
           child: SizedBox(

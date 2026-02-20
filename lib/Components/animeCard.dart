@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:projects/Screens/AnimeDetailScreen.dart';
 import 'package:projects/models/anime.dart';
 import 'package:projects/services/my_list_storage.dart';
 
@@ -18,7 +19,12 @@ class AnimeCard extends StatelessWidget {
           width: 130,
           child: GestureDetector(
             onTap: () {
-              debugPrint("Clicked ${anime.title}");
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => AnimeDetailScreen(anime: anime),
+                ),
+              );
             },
             child: Card(
               elevation: 4,
@@ -76,7 +82,8 @@ class AnimeCard extends StatelessWidget {
                                   isAdded ? "removed from" : "added to";
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text("${anime.title} $action My List"),
+                                  content:
+                                      Text("${anime.title} $action My List"),
                                   duration: const Duration(seconds: 1),
                                 ),
                               );

@@ -5,6 +5,7 @@ import 'package:projects/Components/AnimeBanner.dart';
 import 'package:projects/Components/HorizontalComponents.dart';
 import 'package:projects/api/JikanService.dart';
 import 'package:projects/models/anime.dart';
+import 'package:projects/models/home_section_type.dart';
 
 class MainHome extends StatefulWidget {
   const MainHome({super.key});
@@ -15,7 +16,7 @@ class MainHome extends StatefulWidget {
 
 class _MainHomeState extends State<MainHome> {
   final JikanService api = JikanService();
-  late final Future<Map<String, List<Anime>>> _sectionsFuture;
+  late Future<Map<String, List<Anime>>> _sectionsFuture;
   final PageController _bannerController = PageController();
   Timer? _autoScrollTimer;
   int _bannerCount = 0;
@@ -56,6 +57,17 @@ class _MainHomeState extends State<MainHome> {
     });
   }
 
+  Future<void> _refreshSections() async {
+    setState(() {
+      _currentBannerIndex = 0;
+      _sectionsFuture = api.getAllSections();
+    });
+    await _sectionsFuture;
+    if (_bannerController.hasClients) {
+      _bannerController.jumpToPage(0);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<Map<String, List<Anime>>>(
@@ -80,69 +92,76 @@ class _MainHomeState extends State<MainHome> {
         final trendingTop5 = trending.take(5).toList();
         _syncAutoScroll(trendingTop5.length);
 
-        return ListView(
-          children: [
-            // 🔥 Banner
-            if (trendingTop5.isNotEmpty)
-              SizedBox(
-                height: 360,
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: PageView.builder(
-                        controller: _bannerController,
-                        itemCount: trendingTop5.length,
-                        onPageChanged: (index) =>
-                            setState(() => _currentBannerIndex = index),
-                        itemBuilder: (context, index) =>
-                            AnimeBanner(anime: trendingTop5[index]),
+        return RefreshIndicator(
+          onRefresh: _refreshSections,
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            children: [
+              // 🔥 Banner
+              if (trendingTop5.isNotEmpty)
+                SizedBox(
+                  height: 360,
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: PageView.builder(
+                          controller: _bannerController,
+                          itemCount: trendingTop5.length,
+                          onPageChanged: (index) =>
+                              setState(() => _currentBannerIndex = index),
+                          itemBuilder: (context, index) =>
+                              AnimeBanner(anime: trendingTop5[index]),
+                        ),
                       ),
-                    ),
-                    if (trendingTop5.length > 1)
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(
-                          trendingTop5.length,
-                          (index) => AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            margin: const EdgeInsets.symmetric(
-                              horizontal: 4,
-                              vertical: 4,
-                            ),
-                            width: _currentBannerIndex == index ? 16 : 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: _currentBannerIndex == index
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Colors.grey,
-                              borderRadius: BorderRadius.circular(8),
+                      if (trendingTop5.length > 1)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(
+                            trendingTop5.length,
+                            (index) => AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              margin: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                                vertical: 4,
+                              ),
+                              width: _currentBannerIndex == index ? 16 : 8,
+                              height: 8,
+                              decoration: BoxDecoration(
+                                color: _currentBannerIndex == index
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Colors.grey,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
 
-            // 📺 Sections
-            if (topAiring.isNotEmpty)
-              HorizontalAnimeSection(
-                title: "Top Airing",
-                animeList: topAiring,
-              ),
+              // 📺 Sections
+              if (topAiring.isNotEmpty)
+                HorizontalAnimeSection(
+                  title: "Top Airing",
+                  animeList: topAiring,
+                  sectionType: HomeSectionType.topAiring,
+                ),
 
-            if (mostPopular.isNotEmpty)
-              HorizontalAnimeSection(
-                title: "Most Popular",
-                animeList: mostPopular,
-              ),
+              if (mostPopular.isNotEmpty)
+                HorizontalAnimeSection(
+                  title: "Most Popular",
+                  animeList: mostPopular,
+                  sectionType: HomeSectionType.mostPopular,
+                ),
 
-            if (topTV.isNotEmpty)
-              HorizontalAnimeSection(
-                title: "Top TV Series",
-                animeList: topTV,
-              ),
-          ],
+              if (topTV.isNotEmpty)
+                HorizontalAnimeSection(
+                  title: "Top TV Series",
+                  animeList: topTV,
+                  sectionType: HomeSectionType.topTvSeries,
+                ),
+            ],
+          ),
         );
       },
     );
